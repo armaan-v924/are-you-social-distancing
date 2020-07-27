@@ -9,7 +9,9 @@
 ## Goal
 To be able to detect and distinguish faces with masks on from those without the masks
 
-Optional: ALARM ALARM ALARM
+<br>
+
+Optional: ALARM ALARM ALARM  
 
 ---
 
@@ -26,14 +28,14 @@ Optional: ALARM ALARM ALARM
 
 ### Installation
 Using Anaconda:  
-`conda create -n TheRealShazam python=3.8 jupyter notebook numpy matplotlib xarray numba bottleneck` 
+> `conda create -n TheRealShazam python=3.8 jupyter notebook numpy matplotlib xarray numba bottleneck` 
  
-`conda install -n TheRealShazam -c conda-forge opencv`  
+> `conda install -n TheRealShazam -c conda-forge opencv`  
 
 PyTorch: [Get Instructions Here](https://pytorch.org/get-started/locally/) 
 
 Inside conda environment run:   
-`pip isntall mygrad noggin facenet-pytorch`
+> `pip isntall mygrad noggin facenet-pytorch`
 
 Camera: [Get Instructions Here](https://github.com/cogworksbwsi/camera)  
 Facenet-Models: [Get Instructions Here](https://github.com/CogWorksBWSI/facenet_models)
@@ -47,3 +49,6 @@ Facenet-Models: [Get Instructions Here](https://github.com/CogWorksBWSI/facenet_
 
 ### Sound Clips:
 - [Siren](http://soundbible.com/1577-Siren-Noise.html)
+
+---
+<sup><sub> Warning: The alarm is loud.
