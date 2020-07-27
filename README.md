@@ -7,7 +7,7 @@
 ---
 
 ## Goal
-To be able to detect and distinguish faces with masks on from those without the masks
+Detect and distinguish faces with masks on from those without masks
 
 <br>
 

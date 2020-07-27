@@ -49,6 +49,17 @@ class Model:
             A list of all of the model's trainable parameters 
         """
         return (self.dense1.parameters + self.dense2.parameters)
+        
+    def save_model(self, path):
+        """Path to .npz file where model parameters will be saved."""
+        with open(path, "wb") as f:
+            np.savez(f, *(x.data for x in self.parameters))
+
+    def load_model(self, path):
+        with open(path, "rb") as f:
+            for param, (name, array) in zip(self.parameters, np.load(f).items()):
+                param.data[:] = array
+
 
 #accuracy function!!
 def accuracy(predictions, truth):
