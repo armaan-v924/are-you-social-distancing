@@ -33,3 +33,5 @@ Inside conda environment run:
 
 Camera: [Get Instructions Here](https://github.com/cogworksbwsi/camera)  
 Facenet-Models: [Get Instructions Here](https://github.com/CogWorksBWSI/facenet_models)
+
+## Resources
