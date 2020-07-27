@@ -4,12 +4,28 @@ import matplotlib.pyplot as plt
 import mygrad as mg
 import numpy as np
 import model_setup as ms
+from mynn.losses.cross_entropy import softmax_cross_entropy
 
 # Setup
-model = ms.Model('input size','hidden layer size',2) # TODO insert parameters
-x_train, y_train, x_test, y_test = data() # TODO replace with correct data-retrieving function
-optim = SGD(model.parameters, learning_rate=0.1)
-batch_size = 25 # change based on total number of images in dataset
+with_mask = np.load("with_masks.npy")
+without_mask = np.load("without_masks.npy")
+
+model = ms.Model(76800,50,2) # TODO insert parameters
+x_train_mask, x_test_mask = ms.convert_data(with_mask) # TODO replace with correct data-retrieving function
+x_train_without, x_test_without = ms.convert_data(without_mask) # TODO replace with correct data-retrieving function
+
+y_train_mask = np.ones(x_train_mask.shape[0], dtype=np.int)
+y_test_mask = np.ones(x_test_mask.shape[0], dtype=np.int)
+y_train_without = np.zeros(x_train_without.shape[0], dtype=np.int)
+y_test_without = np.zeros(x_test_without.shape[0], dtype=np.int)
+
+x_train = np.append(x_train_mask, x_train_without, axis=0)
+x_test = np.append(x_test_mask, x_test_without, axis=0)
+y_train = np.append(y_train_mask, y_train_without, axis=0)
+y_test = np.append(y_test_mask, y_test_without, axis=0)
+
+optim = SGD(model.parameters, learning_rate=1E-2) 
+batch_size = 5 # change based on total number of images in dataset
 
 # plotter, fig, ax = create_plot(metrics=["loss", "accuracy"]) ### TODO uncomment when working in jupyter notebook
 

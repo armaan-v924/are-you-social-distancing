@@ -3,6 +3,8 @@ from mynn.activations.relu import relu
 from mynn.optimizers.sgd import SGD
 from mynn.losses.cross_entropy import softmax_cross_entropy
 from mynn.layers.dense import dense
+import numpy as np
+import mygrad as mg
 
 class Model:
     def __init__(self, input_dim, n1, num_classes):
