@@ -9,6 +9,7 @@ time.sleep(2)
 #main
 c = 0
 print("Commands:\n----------\n1 - Take a Picture via Camera\n2 - Upload an Image\n3 - Quit")
+func = 0
 while func != 3:
     try:
         func = int(input("Please enter a number to which method you prefer to upload the image: "))
