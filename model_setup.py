@@ -26,7 +26,7 @@ class Model:
         self.conv2 = conv(f1, f2, 5, 5,
                           weight_initializer=glorot_uniform,
                           weight_kwargs=init_kwargs)
-        self.dense1 = dense(f2 * 5 * 5, d1,
+        self.dense1 = dense(f2 * 37 * 37, d1,
                             weight_initializer=glorot_uniform,
                             weight_kwargs=init_kwargs)
         self.dense2 = dense(d1, num_classes,
@@ -118,12 +118,10 @@ def convert_data(images):
     --------
     A tuple containing the normalized images into (xtrain,xtest)
     '''
-    images = images.reshape(len(images), -1).astype(np.float32)
-    mean_image = images.mean(axis=0)
-    std_image = images.std(axis=0)
+    images = images[:,np.newaxis,:,:]
 
-    images -= mean_image
-    images /= std_image
+    images = images.astype(np.float32)
+    images /= 255.
 
     divide = 4 * len(images) // 5
     return (images[:divide], images[divide:])

@@ -37,7 +37,6 @@ for epoch_cnt in range(10):
         start_ind = batch_cnt*batch_size
         batch_indices = idxs[start_ind : start_ind+batch_size]
         batch = x_train[batch_indices]  # random batch of our training data
-
         pred = model(batch)
         pred_true = y_train[batch_indices]
 
