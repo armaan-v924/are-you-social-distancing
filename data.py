@@ -42,5 +42,5 @@ def find_faces(image):
 
     # Cropped Face
     cropped_face = [img[int(bounding_boxes[n][1]):int(bounding_boxes[n][3]), int(bounding_boxes[n][0]):int(bounding_boxes[n][2])] for n in range(bounding_boxes.shape[0])]
-    resized_crop = np.array([cv2.cvtColor(cv2.resize(img, (160, 160)), cv2.COLOR_BGR2GRAY) for img in cropped_face])
+    resized_crop = np.array([cv2.cvtColor(cv2.resize(img, (160, 160)), cv2.COLOR_RGB2GRAY) for img in cropped_face])
     return cropped_face, resized_crop
