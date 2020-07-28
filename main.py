@@ -2,6 +2,9 @@ import time #necessary to allow the person to take a picture with the camera mod
 import camera
 import cv2
 from data import find_faces
+vid = cv2.VideoCapture(0)
+fourcc = cv2.cv.CV_FOURCC(*'XVID')
+out = cv2.VideoWriter('webcamOut.avi',fourcc,30.0,(640,480))
 
 #loading screen
 time.sleep(1)
@@ -52,7 +55,6 @@ while func != 4:
         func = 0
     elif func == 2:
         time.sleep(2)
-        
         cropped_faces, resized_crop = find_faces(input("Please enter the complete image file path:").strip('"'))
         num_wearing_masks = 0
         for face in resized_crop:
@@ -78,14 +80,15 @@ while func != 4:
         print("1\r")
         time.sleep(1)
         print("0")
-        print("Press 'x' to quit video recording.")
-        vid = cv2.VideoCapture(0)
-        while(True):
+        print("Press 'ctrl+c' to quit video recording.")
+        while True:
             ret, frame = vid.read()
+            out.write(frame)
             cv2.imshow('frame',frame)
-            if cv2.waitKey(1) and 0xFF == ord('x'):
+            if cv2.waitKey(1) and 0xFF == ord('q'):
                 break
         vid.release()
+        out.release()
         cv2.destroyAllWindows()
 
         cropped_faces, resized_crop = find_faces(vid)
