@@ -20,18 +20,16 @@ def find_faces(image):
             (0, 0): Returned if no faces are found
     """
     # Format image
-    if type(image).__module__ is not np.__name__:
+    if type(image) == np.ndarray:
+        img = image
+    else:
         img = cv2.imread(image)
         img = img[:,:,::-1]
-    else:
-        img = image
 
     # Create model
     model = FacenetModel()
 
     # Detect Faces
-
-    bounding_boxes, _, _ = model.detect(img)
     bounding_boxes, _, _ = model.detect(img)
 
     if bounding_boxes is None:
