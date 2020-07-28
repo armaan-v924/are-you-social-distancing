@@ -10,7 +10,7 @@ from mynn.losses.cross_entropy import softmax_cross_entropy
 with_mask = np.load("with_masks.npy")
 without_mask = np.load("without_masks.npy")
 
-model = ms.Model(25600,50,2) # TODO insert parameters
+model = ms.Model(f1=20, f2=10, d1=20, input_dim=1, num_classes=10) # TODO insert parameters
 x_train_mask, x_test_mask = ms.convert_data(with_mask) # TODO replace with correct data-retrieving function
 x_train_without, x_test_without = ms.convert_data(without_mask) # TODO replace with correct data-retrieving function
 
@@ -24,7 +24,7 @@ x_test = np.append(x_test_mask, x_test_without, axis=0)
 y_train = np.append(y_train_mask, y_train_without, axis=0)
 y_test = np.append(y_test_mask, y_test_without, axis=0)
 
-optim = SGD(model.parameters, learning_rate=1E-2) 
+optim = SGD(model.parameters, learning_rate=0.01, momentum=0.9, weight_decay=5e-04)
 batch_size = 5 # change based on total number of images in dataset
 
 # plotter, fig, ax = create_plot(metrics=["loss", "accuracy"]) ### TODO uncomment when working in jupyter notebook
