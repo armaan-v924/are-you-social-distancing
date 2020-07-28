@@ -16,7 +16,7 @@ def find_faces(image):
     Returns:
     --------
     Tuple: (cropped_faces: List of cropped faces numpy arrays (N, X, Y, 3), where N is number of identified faces
-            resized_crop: cropped_faces resized to (N, 160, 160, 3), where N is number of identified faces)
+            resized_crop: cropped_faces resized to (N, 160, 160), where N is number of identified faces)
             (0, 0): Returned if no faces are found
     """
     # Format image
@@ -40,5 +40,5 @@ def find_faces(image):
 
     # Cropped Face
     cropped_face = [img[int(bounding_boxes[n][1]):int(bounding_boxes[n][3]), int(bounding_boxes[n][0]):int(bounding_boxes[n][2])] for n in range(bounding_boxes.shape[0])]
-    resized_crop = np.array([cv2.resize(img, (160, 160)) for img in cropped_face])
+    resized_crop = np.array([cv2.cvtColor(cv2.resize(img, (160, 160)), cv2.COLOR_BGR2GRAY) for img in cropped_face])
     return cropped_face, resized_crop

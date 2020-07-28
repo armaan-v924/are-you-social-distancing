@@ -10,7 +10,7 @@ from mynn.losses.cross_entropy import softmax_cross_entropy
 with_mask = np.load("with_masks.npy")
 without_mask = np.load("without_masks.npy")
 
-model = ms.Model(76800,50,2) # TODO insert parameters
+model = ms.Model(25600,50,2) # TODO insert parameters
 x_train_mask, x_test_mask = ms.convert_data(with_mask) # TODO replace with correct data-retrieving function
 x_train_without, x_test_without = ms.convert_data(without_mask) # TODO replace with correct data-retrieving function
 
