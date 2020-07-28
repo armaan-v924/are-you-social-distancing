@@ -3,8 +3,6 @@ import camera
 import cv2
 from data import find_faces
 vid = cv2.VideoCapture(0)
-fourcc = cv2.cv.CV_FOURCC(*'XVID')
-out = cv2.VideoWriter('webcamOut.avi',fourcc,30.0,(640,480))
 
 #loading screen
 time.sleep(1)
@@ -83,12 +81,10 @@ while func != 4:
         print("Press 'ctrl+c' to quit video recording.")
         while True:
             ret, frame = vid.read()
-            out.write(frame)
             cv2.imshow('frame',frame)
             if cv2.waitKey(1) and 0xFF == ord('q'):
                 break
         vid.release()
-        out.release()
         cv2.destroyAllWindows()
 
         cropped_faces, resized_crop = find_faces(vid)
