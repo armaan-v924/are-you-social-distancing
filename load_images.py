@@ -38,7 +38,7 @@ except ValueError:
     print('Please enter only "1" for with masks, or "0" for no masks.')
 except FileNotFoundError:
     print("Sorry, that folder wasn't found. Please try again.")
-except:
-    print('Something went wrong. Please try again.') # Probably shouldn't run, but just in case I miss something
+# except:
+#    print('Something went wrong. Please try again.') # Probably shouldn't run, but just in case I miss something
 
 
