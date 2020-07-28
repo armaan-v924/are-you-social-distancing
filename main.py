@@ -2,6 +2,7 @@ import time #necessary to allow the person to take a picture with the camera mod
 import camera
 import cv2
 import os
+from model_setup import *
 from data import find_faces
 vid = cv2.VideoCapture(0)
 
@@ -12,7 +13,7 @@ time.sleep(2)
 
 #main
 c = 0
-print("Commands:\n----------\n1 - Take a Picture via Camera\n2 - Upload an Image\n3 - Record a Video\n4 - Quit")
+print("Commands:\n----------\n1 - Take a Picture via Camera\n2 - Upload an Image\n3 - Record a Video (WIP)\n4 - Quit")
 func = 0
 time.sleep(2)
 #Supposed to be in a for loop. That way, you wouldn't have to keep typing python main.py after you finish uploading the picture.
@@ -88,10 +89,11 @@ while func != 4:
             frame = cv2.resize(frame,None,fx=0.5,fy=0.5,interpolation=cv2.INTER_AREA)
             cv2.imshow('Input',frame)
             vidframe.append(frame)
-            c = cv2.waitKey(1)
-            if c == 27:
+            if cv2.waitKey(1) & 0xFF == ord('q'): 
+                vid.release()
+                cv2.destroyAllWindows()
                 break
-        
+        print("bees")
         #set two lists so that it includes cropped faces and resized images.
         cropped_faces = []
         resized_crops = []
@@ -104,10 +106,12 @@ while func != 4:
         #now we itlerate over the frames to see which faces are wearing a mask. We are counting the maximum number of people shown in the recording.
         max_masks = 0
         max_people = 0
+        model = Model(f1=20, f2=10, d1=20, input_dim=1, num_classes=2)
         for crop in resized_crops:
             num_wearing_masks = 0
+            predictions = (crop[:,np.newaxis,:,:].astype(np.float32)) / 255.
             for face in crop:
-                predictions = model(crop)
+                print(predictions)
                 if(predictions[0] > predictions[1]): #wearing mask
                     num_wearing_masks += 1
 
@@ -119,8 +123,6 @@ while func != 4:
 
         print(max_masks + " people wearing masks / ", max_people, " total people --> ", max_masks/max_people) #print stats
 
-        vid.release()
-        cv2.destroyAllWindows()
         time.sleep(2)
         print()
         func = 0
