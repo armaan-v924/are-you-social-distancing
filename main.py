@@ -78,12 +78,17 @@ while func != 4:
         print("1\r")
         time.sleep(1)
         print("0")
-        print("Press 'ctrl+c' to quit video recording.")
+        if not vid.isOpened():
+            raise IOError("Cannot open webcam")
         while True:
             ret, frame = vid.read()
-            cv2.imshow('frame',frame)
-            if cv2.waitKey(1) and 0xFF == ord('q'):
+            frame = cv2.resize(frame,None,fx=0.5,fy=0.5,interpolation=cv2.INTER_AREA)
+            cv2.imshow('Input',frame)
+
+            c = cv2.waitKey(1)
+            if c == 27:
                 break
+        
         vid.release()
         cv2.destroyAllWindows()
 
