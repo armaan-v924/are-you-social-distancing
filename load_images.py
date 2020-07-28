@@ -12,8 +12,11 @@ try:
     for filename in os.listdir(folder):
         print("[DEBUG] Processing " + filename + "...")
         cropped_face, resized_crop = data.find_faces(folder + "/" + filename)
-        for resized in resized_crop:
-            new_faces.append(resized)
+        if cropped_face == 0:
+            print("[DEBUG] No faces found in" + filename)
+        else:
+            for resized in resized_crop:
+                new_faces.append(resized)
 
     new_faces = np.array(new_faces)
 
