@@ -1,6 +1,7 @@
 import time #necessary to allow the person to take a picture with the camera module
 import camera
 import cv2
+import os
 from data import find_faces
 vid = cv2.VideoCapture(0)
 
@@ -89,9 +90,6 @@ while func != 4:
             if c == 27:
                 break
         
-        vid.release()
-        cv2.destroyAllWindows()
-
         cropped_faces, resized_crop = find_faces(vid)
         num_wearing_masks = 0
         for face in resized_crop:
@@ -100,6 +98,8 @@ while func != 4:
                 num_wearing_masks += 1
         print(num_wearing_masks + " people wearing masks / ", len(resized_crop), " total people --> ", num_wearing_masks/len(resized_crop)) #print stats
 
+        vid.release()
+        cv2.destroyAllWindows()
         time.sleep(2)
         print()
         func = 0
