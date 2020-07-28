@@ -30,8 +30,6 @@ def find_faces(image):
     model = FacenetModel()
 
     # Detect Faces
-
-    bounding_boxes, _, _ = model.detect(img)
     bounding_boxes, _, _ = model.detect(img)
 
     if bounding_boxes is None:
