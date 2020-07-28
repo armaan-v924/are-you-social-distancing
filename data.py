@@ -30,7 +30,7 @@ def find_faces(image):
     model = FacenetModel()
 
     # Detect Faces
-    bounding_boxes, probabilities, landmarks = model.detect(img)
+    bounding_boxes, _, _ = model.detect(img)
     for bound in bounding_boxes:
         bound[bound<0]=0
 
