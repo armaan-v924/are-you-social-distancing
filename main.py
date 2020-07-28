@@ -38,13 +38,29 @@ while func != 4:
         print("1\r")
         time.sleep(1)
         print("0")
-        find_faces(camera.take_picture())
+        
+        cropped_faces, resized_crop = find_faces(camera.take_picture())
+        num_wearing_masks = 0
+        for face in resized_crop:
+            predictions = model(resized_crop)
+            if(predictions[0] > predictions[1]): #wearing mask
+                num_wearing_masks += 1
+        print(num_wearing_masks + " people wearing masks / ", len(resized_crop), " total people --> ", num_wearing_masks/len(resized_crop)) #print stats
+
         time.sleep(2)
         print()
         func = 0
     elif func == 2:
         time.sleep(2)
-        find_faces(input("Please enter the complete image file path:").strip('"'))
+        
+        cropped_faces, resized_crop = find_faces(input("Please enter the complete image file path:").strip('"'))
+        num_wearing_masks = 0
+        for face in resized_crop:
+            predictions = model(resized_crop)
+            if(predictions[0] > predictions[1]): #wearing mask
+                num_wearing_masks += 1
+        print(num_wearing_masks + " people wearing masks / ", len(resized_crop), " total people --> ", num_wearing_masks/len(resized_crop)) #print stats
+
         time.sleep(2)
         print()
         func = 0
@@ -71,7 +87,15 @@ while func != 4:
                 break
         vid.release()
         cv2.destroyAllWindows()
-        find_faces(vid)
+
+        cropped_faces, resized_crop = find_faces(vid)
+        num_wearing_masks = 0
+        for face in resized_crop:
+            predictions = model(resized_crop)
+            if(predictions[0] > predictions[1]): #wearing mask
+                num_wearing_masks += 1
+        print(num_wearing_masks + " people wearing masks / ", len(resized_crop), " total people --> ", num_wearing_masks/len(resized_crop)) #print stats
+
         time.sleep(2)
         print()
         func = 0
