@@ -2,20 +2,21 @@ import time #necessary to allow the person to take a picture with the camera mod
 import camera
 import cv2
 import os
+import model_setup as ms
 from model_setup import *
 from data import find_faces
 vid = cv2.VideoCapture(0)
 
 #loading screen
-time.sleep(1)
-print("Welcome to \"Are You Social Distancing?\"") #introduction/name of the program
-time.sleep(2)
+
+print("\nWelcome to \"Are You Social Distancing?\"\n") #introduction/name of the program
 
 #main
+model = Model(f1=20, f2=10, d1=20, input_dim=1, num_classes=2)
 c = 0
-print("Commands:\n----------\n1 - Take a Picture via Camera\n2 - Upload an Image\n3 - Record a Video (WIP)\n4 - Quit")
+print("Commands:\n----------\n1 - Take a Picture via Camera\n2 - Upload an Image\n3 - Record a Video (WIP)\n4 - Quit\n")
 func = 0
-time.sleep(2)
+time.sleep(1)
 #Supposed to be in a for loop. That way, you wouldn't have to keep typing python main.py after you finish uploading the picture.
 while func != 4:
     try:
@@ -29,6 +30,7 @@ while func != 4:
         time.sleep(2)
         func = 0
     if func == 1:
+        #Take a picture using the camera
         time.sleep(2)
         print("Taking a picture in 5...\r")
         time.sleep(1)
@@ -45,10 +47,14 @@ while func != 4:
         cropped_faces, resized_crop = find_faces(camera.take_picture())
         num_wearing_masks = 0
         for face in resized_crop:
-            predictions = model(resized_crop)
-            if(predictions[0] > predictions[1]): #wearing mask
+            convertedOne, convertedTwo = ms.convert_data(face.reshape(1, 160, 160)) #have to reshape for one image and send to convert data to normalize
+            converted = np.append(convertedOne, convertedTwo, axis=0)
+            predictions = model(converted)
+            
+            print("PREDICTIONS = ", predictions)
+            if(predictions[0,0] > predictions[0,1]): #wearing mask
                 num_wearing_masks += 1
-        print(num_wearing_masks + " people wearing masks / ", len(resized_crop), " total people --> ", num_wearing_masks/len(resized_crop)) #print stats
+        print(num_wearing_masks, " people wearing masks / ", len(resized_crop), " total people --> ", float(num_wearing_masks/len(resized_crop)), "%") #print stats
 
         time.sleep(2)
         print()
@@ -58,10 +64,14 @@ while func != 4:
         cropped_faces, resized_crop = find_faces(input("Please enter the complete image file path:").strip('"'))
         num_wearing_masks = 0
         for face in resized_crop:
-            predictions = model(resized_crop)
-            if(predictions[0] > predictions[1]): #wearing mask
+            convertedOne, convertedTwo = ms.convert_data(face.reshape(1, 160, 160)) #have to reshape for one image and send to convert data to normalize
+            converted = np.append(convertedOne, convertedTwo, axis=0)
+            predictions = model(converted)
+            
+            print("PREDICTIONS = ", predictions)
+            if(predictions[0,0] > predictions[0,1]): #wearing mask
                 num_wearing_masks += 1
-        print(num_wearing_masks + " people wearing masks / ", len(resized_crop), " total people --> ", num_wearing_masks/len(resized_crop)) #print stats
+        print(num_wearing_masks, " people wearing masks / ", len(resized_crop), " total people --> ", num_wearing_masks/len(resized_crop)) #print stats
 
         time.sleep(2)
         print()
@@ -106,7 +116,6 @@ while func != 4:
         #now we itlerate over the frames to see which faces are wearing a mask. We are counting the maximum number of people shown in the recording.
         max_masks = 0
         max_people = 0
-        model = Model(f1=20, f2=10, d1=20, input_dim=1, num_classes=2)
         for crop in resized_crops:
             num_wearing_masks = 0
             predictions = (crop[:,np.newaxis,:,:].astype(np.float32)) / 255.
