@@ -1,5 +1,6 @@
 import time #necessary to allow the person to take a picture with the camera module
 import camera
+import cv2
 from data import find_faces
 
 #loading screen
@@ -9,15 +10,15 @@ time.sleep(2)
 
 #main
 c = 0
-print("Commands:\n----------\n1 - Take a Picture via Camera\n2 - Upload an Image\n3 - Quit")
+print("Commands:\n----------\n1 - Take a Picture via Camera\n2 - Upload an Image\n3 - Record a Video\n4 - Quit")
 func = 0
 time.sleep(2)
 #Supposed to be in a for loop. That way, you wouldn't have to keep typing python main.py after you finish uploading the picture.
-while func != 3:
+while func != 4:
     try:
         func = int(input("Please enter a number to which method you prefer to upload the image: "))
     except ValueError: 
-        print('Invalid Input. Please enter only \"1\" or \"2\" or \"3\"\n')
+        print('Invalid Input. Please enter only \"1\" or \"2\" or \"3\" or \"4\"\n')
         func = 0
     except:
         time.sleep(2)
@@ -48,8 +49,35 @@ while func != 3:
         print()
         func = 0
 
-    # Since the function is in a for loop, a shutdown module must be needed to break the loop and exit the program.
     elif func == 3:
+        time.sleep(2)
+        print("Recording a video in 5...\r")
+        time.sleep(1)
+        print("4\r")
+        time.sleep(1)
+        print("3\r")
+        time.sleep(1)
+        print("2\r")
+        time.sleep(1)
+        print("1\r")
+        time.sleep(1)
+        print("0")
+        print("Press 'x' to quit video recording.")
+        vid = cv2.VideoCapture(0)
+        while(True):
+            ret, frame = vid.read()
+            cv2.imshow('frame',frame)
+            if cv2.waitKey(1) and 0xFF == ord('x'):
+                break
+        vid.release()
+        cv2.destroyAllWindows()
+        find_faces(vid)
+        time.sleep(2)
+        print()
+        func = 0
+
+    # Since the function is in a for loop, a shutdown module must be needed to break the loop and exit the program.
+    elif func == 4:
         time.sleep(2)
         print("@2020 @therealshazam \n -----------------------")
         break
