@@ -20,7 +20,7 @@ model = Model(f1=20, f2=10, d1=20, input_dim=1, num_classes=2)
 model.load_model("trained_parameters.npz")
 model2 = FacenetModel()
 c = 0
-print("Commands:\n----------\n1 - Take a Picture via Camera\n2 - Upload an Image\n3 - Record a Video (WIP)\n4 - Upload a Video\n5 - Quit\n")
+print("Commands:\n----------\n1 - Take a Picture via Camera\n2 - Upload an Image\n3 - Record a Video\n4 - Upload a Video\n5 - Quit\n")
 func = 0
 #Supposed to be in a for loop. That way, you wouldn't have to keep typing python main.py after you finish uploading the picture.
 while func != 5:
