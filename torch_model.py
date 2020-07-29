@@ -25,28 +25,20 @@ class TorchModel(nn.Module):
         relu = nn.ReLU()
         max_pool = nn.MaxPool2d((2, 2), 2)
 
+        
         x = relu(self.conv1(x))
         x = max_pool(x)
-        x = relu(self.conv2(x))
+        x = func.dropout(relu(self.conv2(x)), p=0.1)
         x = max_pool(x)
         x = relu(self.dense1(x.reshape(x.shape[0], -1)))
         return self.dense2(x)
 
-    @property
-    def parameters(self):
-        params = []
-        for layer in (self.conv1, self.conv2, self.dense1, self.dense2):
-            params += list((layer.weight, layer.bias))
-        return params
-
-    def save_model(self, path):
-        with open(path, "wb") as f:
-            np.savez(f, *(x.data for x in self.parameters))
-
-    def load_model(self, path):
-        with open(path, "wb") as f:
-            for param, (name, array) in zip(self.parameters, np.load(f).items()):
-                param.numpy()[:] = array
+    # @property
+    # def parameters(self):
+    #     params = []
+    #     for layer in (self.conv1, self.conv2, self.dense1, self.dense2):
+    #         params += list((layer.weight, layer.bias))
+    #     return params
 
 def accuracy(predictions, truth):
     if isinstance(predictions, torch.Tensor):
@@ -61,4 +53,8 @@ def convert_data(images):
 
     divide = 4 * len(images) // 5
     return (images[:divide], images[divide:])
+
+# Saving and Loading
+# Save: torch.save(model.state_dict(), PATH)
+# Load: model.load_state_dict(torch.load(PATH))
 
