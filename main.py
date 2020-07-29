@@ -5,6 +5,7 @@ import os
 import model_setup as ms
 from model_setup import *
 from data import find_faces
+import display_image as di
 from facenet_models import FacenetModel
 vid = cv2.VideoCapture(0)
 
@@ -17,24 +18,23 @@ model = Model(f1=20, f2=10, d1=20, input_dim=1, num_classes=2)
 model.load_model("trained_parameters.npz")
 model2 = FacenetModel()
 c = 0
-print("Commands:\n----------\n1 - Take a Picture via Camera\n2 - Upload an Image\n3 - Record a Video (WIP)\n4 - Quit\n")
+print("Commands:\n----------\n1 - Take a Picture via Camera\n2 - Upload an Image\n3 - Record a Video (WIP)\n4 - Upload a Video\n5 - Quit\n")
 func = 0
-time.sleep(1)
 #Supposed to be in a for loop. That way, you wouldn't have to keep typing python main.py after you finish uploading the picture.
-while func != 4:
+while func != 5:
     try:
         func = int(input("Please enter a number to which method you prefer to upload the image: "))
     except ValueError: 
-        print('Invalid Input. Please enter only \"1\" or \"2\" or \"3\" or \"4\"\n')
+        print('Invalid Input. Please enter only \"1\" or \"2\" or \"3\" or \"4\" or \"5\"\n')
         func = 0
     except:
-        time.sleep(2)
+        # time.sleep(2)
         print('Something went wrong. Please try again.\n')
-        time.sleep(2)
+        # time.sleep(2)
         func = 0
     if func == 1:
         #Take a picture using the camera
-        time.sleep(2)
+        # time.sleep(2)
         print("Taking a picture in 5...\r")
         time.sleep(1)
         print("4\r")
@@ -47,42 +47,28 @@ while func != 4:
         time.sleep(1)
         print("0")
         
-        bb, cropped_faces, resized_crop = find_faces(camera.take_picture(),model2)
+        image = camera.take_picture()
+
+        bb, cropped_faces, resized_crop = find_faces(image,model2)
         if(type(resized_crop) == int and resized_crop == 0):
                 print("No faces detected")
         else:
-            num_wearing_masks = 0
-            for face in resized_crop:
-                convertedOne, convertedTwo = ms.convert_data(face.reshape(1, 160, 160)) #have to reshape for one image and send to convert data to normalize
-                converted = np.append(convertedOne, convertedTwo, axis=0)
-                predictions = model(converted)
-                
-                print("PREDICTIONS = ", predictions)
-                if(predictions[0,1] > predictions[0,0]): #wearing mask
-                    num_wearing_masks += 1
-            print(num_wearing_masks, " people wearing masks / ", len(resized_crop), " total people --> ", float(num_wearing_masks/len(resized_crop))*100, "%") #print stats
+            di.show_image(image, model, bb, resized_crop, True)
 
-        time.sleep(2)
+        # time.sleep(2)
         print()
         func = 0
     elif func == 2:
-        time.sleep(2)
-        bb, cropped_faces, resized_crop = find_faces(input("Please enter the complete image file path:").strip('"'),model2)
+        # time.sleep(2)
+        image = cv2.imread(input("Please enter the complete image file path:").strip('"'))
+        image = image[:,:,::-1]
+        bb, cropped_faces, resized_crop = find_faces(image,model2)
         if(type(resized_crop) == int and resized_crop == 0):
                 print("No faces detected")
         else:
-            num_wearing_masks = 0
-            for face in resized_crop:
-                convertedOne, convertedTwo = ms.convert_data(face.reshape(1, 160, 160)) #have to reshape for one image and send to convert data to normalize
-                converted = np.append(convertedOne, convertedTwo, axis=0)
-                predictions = model(converted)
-                
-                print("PREDICTIONS = ", predictions)
-                if(predictions[0,1] > predictions[0,0]): #wearing mask
-                    num_wearing_masks += 1
-            print(num_wearing_masks, " people wearing masks / ", len(resized_crop), " total people --> ", num_wearing_masks/len(resized_crop)) #print stats
+            di.show_image(image, model, bb, resized_crop, True)
 
-        time.sleep(2)
+        # time.sleep(2)
         print()
         func = 0
 
@@ -105,36 +91,22 @@ while func != 4:
         print("Press the esc button to stop recording the video\n")
         while True:
             ret, frame = vid.read()
-            frame = cv2.resize(frame,None,fx=0.5,fy=0.5,interpolation=cv2.INTER_AREA)
-            cv2.imshow('Input',frame)
-            vidframe.append(frame)
-            width = vid.get(cv2.CAP_PROP_FRAME_WIDTH)  # float
-            height = vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
-            #each frame calculate # with/without masks (live)
-            bb, cropped_faces, resized_crop = find_faces(frame,model2)
-            num_wearing_masks = 0
-            if(type(resized_crop) == int and resized_crop == 0):
-                print("No faces detected")
+            
+            if ret == True:
+                frame = cv2.resize(frame,None,fx=0.5,fy=0.5,interpolation=cv2.INTER_AREA)
+                cv2.imshow('Input',frame)
+                vidframe.append(frame)
+                width = vid.get(cv2.CAP_PROP_FRAME_WIDTH)  # float
+                height = vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
+                #each frame calculate # with/without masks (live)
+                bb, cropped_faces, resized_crop = find_faces(frame,model2)
+                num_wearing_masks = 0
+                if(type(resized_crop) == int and resized_crop == 0):
+                    print("No faces detected")
+                else:
+                    frame = di.convert_image(frame, model, bb, resized_crop, bgr=False, resize=False)
             else:
-                counter = 0
-                for face in resized_crop:
-                    convertedOne, convertedTwo = ms.convert_data(face.reshape(1, 160, 160)) #have to reshape for one image and send to convert data to normalize
-                    converted = np.append(convertedOne, convertedTwo, axis=0)
-                    predictions = model(converted)
-                    if(predictions[0,1] > predictions[0,0]): #wearing mask
-                        num_wearing_masks += 1
-                        frame = cv2.rectangle(frame, (bb[counter][0],bb[counter][1]), (bb[counter][2], bb[counter][3]),
-                                              (0, 255, 0), 2)
-                        frame = cv2.putText(frame, 'MASK', (bb[counter][0],bb[counter][1]), cv2.FONT_HERSHEY_SIMPLEX,
-                                            0.5, (0, 255, 0), 1, cv2.LINE_AA)
-                    else:
-                        frame = cv2.rectangle(frame, (bb[counter][0], bb[counter][1]), (bb[counter][2], bb[counter][3]),
-                                              (0, 0, 255), 2)
-                        frame = cv2.putText(frame, 'NO MASK', (bb[counter][0], bb[counter][1]), cv2.FONT_HERSHEY_SIMPLEX,
-                                            0.5, (0, 0, 255), 1, cv2.LINE_AA)
-                    counter+=1
-                print(num_wearing_masks, " people wearing masks / ", len(resized_crop), " total people --> ", num_wearing_masks/len(resized_crop)*100, "%") #print stats
-
+                break
             cv2.imshow('Input', frame)
             if cv2.waitKey(1) & 0xFF == ord('q'): 
                 vid.release()
@@ -167,6 +139,38 @@ while func != 4:
 
     # Since the function is in a for loop, a shutdown module must be needed to break the loop and exit the program.
     elif func == 4:
+        vid = cv2.VideoCapture(input("Please enter the complete video file path: ").strip('"'))
+
+        while (vid.isOpened()):
+            ret, frame = vid.read()
+
+            if ret == True:
+                frame = cv2.resize(frame,None,fx=0.25,fy=0.25,interpolation=cv2.INTER_AREA)
+                cv2.imshow('Input',frame)
+                width = vid.get(cv2.CAP_PROP_FRAME_WIDTH)  # float
+                height = vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
+                #each frame calculate # with/without masks (live)
+                bb, cropped_faces, resized_crop = find_faces(frame,model2)
+                num_wearing_masks = 0
+                if(type(resized_crop) == int and resized_crop == 0):
+                    print("No faces detected")
+                else:
+                    frame = di.convert_image(frame, model, bb, resized_crop, bgr=False, resize=False)
+
+                cv2.imshow('Input', frame)
+                if cv2.waitKey(1) & 0xFF == ord('q'): 
+                    vid.release()
+                    cv2.destroyAllWindows()
+                    break
+            else:
+                break
+        vid.release()
+        cv2.destroyAllWindows()
+
+        # time.sleep(2)
+        print()
+        func = 0
+    elif func == 5:
         time.sleep(2)
         print("@2020 @therealshazam \n -----------------------")
         break
