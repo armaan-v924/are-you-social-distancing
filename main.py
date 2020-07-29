@@ -21,7 +21,6 @@ model2 = FacenetModel()
 c = 0
 print("Commands:\n----------\n1 - Take a Picture via Camera\n2 - Upload an Image\n3 - Capture a Video\n4 - Upload a Video\n5 - Quit\n")
 func = 0
-time.sleep(1)
 #Supposed to be in a for loop. That way, you wouldn't have to keep typing python main.py after you finish uploading the picture.
 while func != 5:
     try:
@@ -177,7 +176,6 @@ while func != 5:
         pass
     # Since the function is in a for loop, a shutdown module must be needed to break the loop and exit the program.
     elif func == 5:
-        time.sleep(2)
         print("@2020 @therealshazam\n-----------------------")
         break
 
