@@ -1,5 +1,4 @@
 # Imports
-from facenet_models import FacenetModel
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,7 +6,7 @@ import cv2
 import camera
 
 # Create Rectangles
-def find_faces(image):
+def find_faces(image,model):
     """ Using facenet_models, locate faces in a given picture and create descriptor vecors
     Parameters:
     -----------
@@ -25,9 +24,6 @@ def find_faces(image):
     else:
         img = cv2.imread(image)
         img = img[:,:,::-1]
-
-    # Create model
-    model = FacenetModel()
 
     # Detect Faces
     bounding_boxes, _, _ = model.detect(img)

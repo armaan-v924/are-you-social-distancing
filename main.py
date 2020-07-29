@@ -5,6 +5,7 @@ import os
 import model_setup as ms
 from model_setup import *
 from data import find_faces
+from facenet_models import FacenetModel
 vid = cv2.VideoCapture(0)
 
 #loading screen
@@ -14,6 +15,7 @@ print("\nWelcome to \"Are You Social Distancing?\"\n") #introduction/name of the
 #main
 model = Model(f1=20, f2=10, d1=20, input_dim=1, num_classes=2)
 model.load_model("trained_parameters.npz")
+model2 = FacenetModel()
 c = 0
 print("Commands:\n----------\n1 - Take a Picture via Camera\n2 - Upload an Image\n3 - Record a Video (WIP)\n4 - Quit\n")
 func = 0
@@ -45,7 +47,7 @@ while func != 4:
         time.sleep(1)
         print("0")
         
-        cropped_faces, resized_crop = find_faces(camera.take_picture())
+        cropped_faces, resized_crop = find_faces(camera.take_picture(),model2)
         if(type(resized_crop) == int and resized_crop == 0):
                 print("No faces detected")
         else:
@@ -65,7 +67,7 @@ while func != 4:
         func = 0
     elif func == 2:
         time.sleep(2)
-        cropped_faces, resized_crop = find_faces(input("Please enter the complete image file path:").strip('"'))
+        cropped_faces, resized_crop = find_faces(input("Please enter the complete image file path:").strip('"'),model2)
         if(type(resized_crop) == int and resized_crop == 0):
                 print("No faces detected")
         else:
@@ -108,7 +110,7 @@ while func != 4:
             vidframe.append(frame)
             
             #each frame calculate # with/without masks (live)
-            cropped_faces, resized_crop = find_faces(frame)
+            cropped_faces, resized_crop = find_faces(frame,model2)
             num_wearing_masks = 0
             if(type(resized_crop) == int and resized_crop == 0):
                 print("No faces detected")
