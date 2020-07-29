@@ -30,9 +30,8 @@ while func != 5:
         print('Invalid Input. Please enter only \"1\" or \"2\" or \"3\" or \"4\" or \"5\"\n')
         func = 0
     except:
-        time.sleep(2)
         print('Something went wrong. Please try again.\n')
-        time.sleep(2)
+        print()
         func = 0
     if func == 1:
         #Take a picture using the camera
@@ -64,11 +63,9 @@ while func != 5:
                     num_wearing_masks += 1
             print(num_wearing_masks, " people wearing masks / ", len(resized_crop), " total people --> ", float(num_wearing_masks/len(resized_crop))*100, "%") #print stats
 
-        time.sleep(2)
         print()
         func = 0
     elif func == 2:
-        time.sleep(2)
         bb, cropped_faces, resized_crop = find_faces(input("Please enter the complete image file path:").strip('"'),model2)
         if(type(resized_crop) == int and resized_crop == 0):
                 print("No faces detected")
@@ -84,7 +81,6 @@ while func != 5:
                     num_wearing_masks += 1
             print(num_wearing_masks, " people wearing masks / ", len(resized_crop), " total people --> ", num_wearing_masks/len(resized_crop)) #print stats
 
-        time.sleep(2)
         print()
         func = 0
 
@@ -172,7 +168,6 @@ while func != 5:
                 break
 
 
-        time.sleep(2)
         print()
         func = 0
         stream.close()
@@ -202,4 +197,3 @@ while func != 5:
 
 
 
->>>>>>> f444904b77df533a9ddea7160ae1259920791443
