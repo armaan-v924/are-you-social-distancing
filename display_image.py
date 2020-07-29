@@ -3,8 +3,11 @@ import cv2
 import data
 import numpy as np
 import model_setup as ms
+import torch
+import torch_model as tm
+import no_depth_dist as ndd
 
-def convert_image(image, model, bounding_boxes, resized_crop, bgr=True, resize=True):
+def convert_image(image, model, landmarks, bounding_boxes, resized_crop, bgr=True, resize=True):
     """Uses faces found from data.find_faces and a trained model to, draw green boxes 
     around the faces with masks on, and draw red boxes around the faces without masks on.
 
@@ -26,6 +29,7 @@ def convert_image(image, model, bounding_boxes, resized_crop, bgr=True, resize=T
     np.ndarray
     Describes image that now has boxes around faces and text describing mask/no mask
     """
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
     height = image.shape[0]
     width = image.shape[1]
     
@@ -37,14 +41,20 @@ def convert_image(image, model, bounding_boxes, resized_crop, bgr=True, resize=T
     else:
         sf = 1
 
+    if bgr:
+        red = (255, 0, 0)
+    else:
+        red = (0, 0, 255)
+
     image = cv2.resize(image, (np.rint(width*sf).astype(np.int), np.rint(height*sf).astype(np.int)))
     bounding_boxes = np.rint(bounding_boxes*sf).astype(np.int)
+    landmarks = np.rint(landmarks*sf).astype(np.int)
 
-    convertedOne, convertedTwo = ms.convert_data(resized_crop)
+    convertedOne, convertedTwo = tm.convert_data(resized_crop)
     converted = np.append(convertedOne, convertedTwo, axis=0)
 
-    preds = model(converted)
-    preds = np.argmax(preds, axis=1)
+    preds = model(torch.Tensor(converted).to(device))
+    preds = np.argmax(preds.data, axis=1)
     num_wearing_masks = np.count_nonzero(preds)
 
     for box, pred in zip(bounding_boxes, preds):
@@ -52,10 +62,7 @@ def convert_image(image, model, bounding_boxes, resized_crop, bgr=True, resize=T
             color = (0, 255, 0)
             text = "Mask"
         else:
-            if bgr:
-                color = (255, 0, 0)
-            else:
-                color = (0, 0, 255)
+            color = red
             text = "No Mask"
         
         image = cv2.rectangle(image, (box[0], box[1]), (box[2], box[3]), color, 2)
@@ -64,6 +71,13 @@ def convert_image(image, model, bounding_boxes, resized_crop, bgr=True, resize=T
             image = cv2.putText(image, text, (box[0], box[1]-10), cv2.FONT_HERSHEY_COMPLEX, 0.5, color, 2)
         else:
             image = cv2.putText(image, text, (box[0], box[3]+15), cv2.FONT_HERSHEY_COMPLEX, 0.5, color, 1)
+    
+    # if len(resized_crop) > 1:
+    #     for i in range(len(resized_crop)-1):
+    #         if ndd.r_u_sd_in_2d(landmarks[i:i+2], threshold=72) == False:
+    #             image = cv2.line(image,(landmarks[i, 2][0],landmarks[i, 2][1]),
+    #                             (landmarks[i+1, 2][0],landmarks[i+1, 2][1]),red,2)
+
     if bgr:
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     return image, num_wearing_masks

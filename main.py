@@ -7,6 +7,7 @@ import wave
 import threading
 import model_setup as ms
 from model_setup import *
+from torch_model import *
 from data import find_faces
 import display_image as di
 from facenet_models import FacenetModel
@@ -58,17 +59,10 @@ def run_video():
                 frame = cv2.putText(frame, "No faces detected", (30,30), cv2.FONT_HERSHEY_SIMPLEX,
                                             0.5, (255, 0, 0), 1, cv2.LINE_AA)
             else:
-                frame, num_wearing_masks = di.convert_image(frame, model, bb, resized_crop, bgr=False, resize=False)
+                frame, num_wearing_masks = di.convert_image(frame, model, landmarks, bb, resized_crop, bgr=False, resize=False)
                 percent_wearing_masks = num_wearing_masks/len(resized_crop)*100
                 frame = cv2.putText(frame, (str(percent_wearing_masks) + "% wearing masks"), (30,30), cv2.FONT_HERSHEY_SIMPLEX,
                                             0.5, (255, 0, 0), 1, cv2.LINE_AA)
-
-                if len(resized_crop) > 1:
-                    for i in range(len(resized_crop)-1):
-                        if r_u_sd_in_2d(landmarks[i:i+2], threshold=72) == False:
-                            frame = cv2.line(frame,(landmarks[i, 2][0],landmarks[i, 2][1]),
-                                            (landmarks[i+1, 2][0],landmarks[i+1, 2][1]),(0, 0, 255),2)
-
 
             cv2.imshow('Input',frame)
         else:
@@ -84,8 +78,9 @@ def run_video():
 print("\nWelcome to \"Are You Social Distancing?\"\n") #introduction/name of the program
 
 #main
-model = Model(f1=20, f2=10, d1=20, input_dim=1, num_classes=2)
-model.load_model("trained_parameters.npz")
+model = TorchModel(input_dim=1, f1=20, f2=10, d1=20, num_classes=2)
+model.load_state_dict(torch.load("torch_params.pt", map_location="cpu"))
+# model.load_model("trained_parameters.npz")
 model2 = FacenetModel()
 c = 0
 print("Commands:\n----------\n1 - Take a Picture via Camera\n2 - Upload an Image\n3 - Record a Video\n4 - Upload a Video\n5 - Quit\n")
@@ -124,7 +119,7 @@ while func != 5:
             image = cv2.putText(image, "No faces detected", (30,30), cv2.FONT_HERSHEY_SIMPLEX,
                                         0.5, (255, 0, 0), 1, cv2.LINE_AA)
         else:
-            image, num_wearing_masks = di.convert_image(image, model, bb, resized_crop)
+            image, num_wearing_masks = di.convert_image(image, model, landmarks, bb, resized_crop)
 
             percent_wearing_masks = num_wearing_masks/len(resized_crop)*100
             image = cv2.putText(image, (str(percent_wearing_masks) + "% wearing masks"), (30,30), cv2.FONT_HERSHEY_SIMPLEX,
@@ -145,7 +140,7 @@ while func != 5:
             image = cv2.putText(image, "No faces detected", (30,30), cv2.FONT_HERSHEY_SIMPLEX,
                                         0.5, (255, 0, 0), 1, cv2.LINE_AA)
         else:
-            image, num_wearing_masks = di.convert_image(image, model, bb, resized_crop)
+            image, num_wearing_masks = di.convert_image(image, model, landmarks, bb, resized_crop)
 
             percent_wearing_masks = num_wearing_masks/len(resized_crop)*100
             image = cv2.putText(image, (str(percent_wearing_masks) + "% wearing masks"), (30,30), cv2.FONT_HERSHEY_SIMPLEX,
@@ -183,15 +178,12 @@ while func != 5:
         siren = threading.Thread(target=siren_run)
 
         siren.start()
+                
         run_video()
 
         siren.join()
-
-
         print()
         func = 0
-        #stream.close()
-        #p.terminate()
 
     elif func == 4:
         vid = cv2.VideoCapture(input("Please enter the complete video file path: ").strip('"'))
@@ -210,7 +202,7 @@ while func != 5:
                     frame = cv2.putText(frame, "No faces detected", (30,30), cv2.FONT_HERSHEY_SIMPLEX,
                                                 0.5, (255, 0, 0), 1, cv2.LINE_AA)
                 else:
-                    frame, num_wearing_masks = di.convert_image(frame, model, bb, resized_crop, bgr=False, resize=False)
+                    frame, num_wearing_masks = di.convert_image(frame, model, landmarks, bb, resized_crop, bgr=False, resize=False)
                     percent_wearing_masks = num_wearing_masks/len(resized_crop)*100
                     frame = cv2.putText(frame, (str(percent_wearing_masks) + "% wearing masks"), (30,30), cv2.FONT_HERSHEY_SIMPLEX,
                                                 0.5, (255, 0, 0), 1, cv2.LINE_AA)
