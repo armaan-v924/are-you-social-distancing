@@ -47,7 +47,7 @@ while func != 4:
         time.sleep(1)
         print("0")
         
-        cropped_faces, resized_crop = find_faces(camera.take_picture(),model2)
+        bb, cropped_faces, resized_crop = find_faces(camera.take_picture(),model2)
         if(type(resized_crop) == int and resized_crop == 0):
                 print("No faces detected")
         else:
@@ -60,14 +60,14 @@ while func != 4:
                 print("PREDICTIONS = ", predictions)
                 if(predictions[0,1] > predictions[0,0]): #wearing mask
                     num_wearing_masks += 1
-            print(num_wearing_masks, " people wearing masks / ", len(resized_crop), " total people --> ", float(num_wearing_masks/len(resized_crop)), "%") #print stats
+            print(num_wearing_masks, " people wearing masks / ", len(resized_crop), " total people --> ", float(num_wearing_masks/len(resized_crop))*100, "%") #print stats
 
         time.sleep(2)
         print()
         func = 0
     elif func == 2:
         time.sleep(2)
-        cropped_faces, resized_crop = find_faces(input("Please enter the complete image file path:").strip('"'),model2)
+        bb, cropped_faces, resized_crop = find_faces(input("Please enter the complete image file path:").strip('"'),model2)
         if(type(resized_crop) == int and resized_crop == 0):
                 print("No faces detected")
         else:
@@ -108,21 +108,34 @@ while func != 4:
             frame = cv2.resize(frame,None,fx=0.5,fy=0.5,interpolation=cv2.INTER_AREA)
             cv2.imshow('Input',frame)
             vidframe.append(frame)
-            
+            width = vid.get(cv2.CAP_PROP_FRAME_WIDTH)  # float
+            height = vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
             #each frame calculate # with/without masks (live)
-            cropped_faces, resized_crop = find_faces(frame,model2)
+            bb, cropped_faces, resized_crop = find_faces(frame,model2)
             num_wearing_masks = 0
             if(type(resized_crop) == int and resized_crop == 0):
                 print("No faces detected")
             else:
+                counter = 0
                 for face in resized_crop:
                     convertedOne, convertedTwo = ms.convert_data(face.reshape(1, 160, 160)) #have to reshape for one image and send to convert data to normalize
                     converted = np.append(convertedOne, convertedTwo, axis=0)
                     predictions = model(converted)
                     if(predictions[0,1] > predictions[0,0]): #wearing mask
                         num_wearing_masks += 1
-                print(num_wearing_masks, " people wearing masks / ", len(resized_crop), " total people --> ", num_wearing_masks/len(resized_crop), "%") #print stats
+                        frame = cv2.rectangle(frame, (bb[counter][0],bb[counter][1]), (bb[counter][2], bb[counter][3]),
+                                              (0, 255, 0), 2)
+                        frame = cv2.putText(frame, 'MASK', (bb[counter][0],bb[counter][1]), cv2.FONT_HERSHEY_SIMPLEX,
+                                            0.5, (0, 255, 0), 1, cv2.LINE_AA)
+                    else:
+                        frame = cv2.rectangle(frame, (bb[counter][0], bb[counter][1]), (bb[counter][2], bb[counter][3]),
+                                              (0, 0, 255), 2)
+                        frame = cv2.putText(frame, 'NO MASK', (bb[counter][0], bb[counter][1]), cv2.FONT_HERSHEY_SIMPLEX,
+                                            0.5, (0, 0, 255), 1, cv2.LINE_AA)
+                    counter+=1
+                print(num_wearing_masks, " people wearing masks / ", len(resized_crop), " total people --> ", num_wearing_masks/len(resized_crop)*100, "%") #print stats
 
+            cv2.imshow('Input', frame)
             if cv2.waitKey(1) & 0xFF == ord('q'): 
                 vid.release()
                 cv2.destroyAllWindows()
@@ -132,7 +145,7 @@ while func != 4:
         #now we itlerate over the frames to see which faces are wearing a mask. We are counting the maximum number of people shown in the recording.
         max_masks = 0
         max_people = 0
-        for crop in resized_crops:
+        for crop in resized_crop:
             num_wearing_masks = 0
             predictions = (crop[:,np.newaxis,:,:].astype(np.float32)) / 255.
             for face in crop:

@@ -118,7 +118,6 @@ def convert_data(images):
     --------
     A tuple containing the normalized images into (xtrain,xtest)
     '''
-    print(images.shape)
     images = images[:,np.newaxis,:,:]
 
     images = images.astype(np.float32)
