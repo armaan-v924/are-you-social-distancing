@@ -2,7 +2,7 @@ import time #necessary to allow the person to take a picture with the camera mod
 import camera
 import cv2
 import os
-# import pyaudio
+import pyaudio
 import wave
 import model_setup as ms
 from model_setup import *
