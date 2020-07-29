@@ -9,6 +9,7 @@ from model_setup import *
 from data import find_faces
 import display_image as di
 from facenet_models import FacenetModel
+from no_depth_dist import *
 vid = cv2.VideoCapture(0)
 
 #loading screen
