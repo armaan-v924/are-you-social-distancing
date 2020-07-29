@@ -135,7 +135,7 @@ while func != 5:
                 width = vid.get(cv2.CAP_PROP_FRAME_WIDTH)  # float
                 height = vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
                 #each frame calculate # with/without masks (live)
-                bb, cropped_faces, resized_crop = find_faces(frame,model2)
+                landmarks, bb, cropped_faces, resized_crop = find_faces(frame,model2)
                 num_wearing_masks = 0
 
                 if(type(resized_crop) == int and resized_crop == 0):
