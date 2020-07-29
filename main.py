@@ -13,6 +13,7 @@ print("\nWelcome to \"Are You Social Distancing?\"\n") #introduction/name of the
 
 #main
 model = Model(f1=20, f2=10, d1=20, input_dim=1, num_classes=2)
+model.load_model("trained_parameters.npz")
 c = 0
 print("Commands:\n----------\n1 - Take a Picture via Camera\n2 - Upload an Image\n3 - Record a Video (WIP)\n4 - Quit\n")
 func = 0
@@ -52,7 +53,7 @@ while func != 4:
             predictions = model(converted)
             
             print("PREDICTIONS = ", predictions)
-            if(predictions[0,0] > predictions[0,1]): #wearing mask
+            if(predictions[0,1] > predictions[0,0]): #wearing mask
                 num_wearing_masks += 1
         print(num_wearing_masks, " people wearing masks / ", len(resized_crop), " total people --> ", float(num_wearing_masks/len(resized_crop)), "%") #print stats
 
@@ -69,7 +70,7 @@ while func != 4:
             predictions = model(converted)
             
             print("PREDICTIONS = ", predictions)
-            if(predictions[0,0] > predictions[0,1]): #wearing mask
+            if(predictions[0,1] > predictions[0,0]): #wearing mask
                 num_wearing_masks += 1
         print(num_wearing_masks, " people wearing masks / ", len(resized_crop), " total people --> ", num_wearing_masks/len(resized_crop)) #print stats
 
@@ -121,7 +122,7 @@ while func != 4:
             predictions = (crop[:,np.newaxis,:,:].astype(np.float32)) / 255.
             for face in crop:
                 print(predictions)
-                if(predictions[0] > predictions[1]): #wearing mask
+                if(predictions[1] > predictions[0]): #wearing mask
                     num_wearing_masks += 1
 
             #the stats will be modified to indicate the maximum number of masks over the total number of people in the video.
