@@ -2,6 +2,8 @@ import time #necessary to allow the person to take a picture with the camera mod
 import camera
 import cv2
 import os
+import pyaudio
+import wave
 import model_setup as ms
 from model_setup import *
 from data import find_faces
@@ -87,7 +89,23 @@ while func != 4:
         func = 0
 
     elif func == 3:
-        time.sleep(2)
+        #siren set up
+        filename = 'siren.wav'
+        chunk = 1024  
+
+        wf = wave.open(filename, 'rb')
+        p = pyaudio.PyAudio()
+
+        # Open a .Stream object to write the WAV file to
+        # 'output = True' indicates that the sound will be played rather than recorded
+        stream = p.open(format = p.get_format_from_width(wf.getsampwidth()),
+                        channels = wf.getnchannels(),
+                        rate = wf.getframerate(),
+                        output = True)
+
+        # Read data in chunks
+        data = wf.readframes(chunk)
+
         print("Recording a video in 5...\r")
         time.sleep(1)
         print("4\r")
@@ -134,9 +152,15 @@ while func != 4:
                         frame = cv2.putText(frame, 'NO MASK', (bb[counter][0], bb[counter][1]), cv2.FONT_HERSHEY_SIMPLEX,
                                             0.5, (0, 0, 255), 1, cv2.LINE_AA)
                     counter+=1
-
-                frame = cv2.putText(frame, (str(num_wearing_masks/len(resized_crop)*100) + "% wearing masks"), (30,30), cv2.FONT_HERSHEY_SIMPLEX,
+                
+                percent_wearing_masks = num_wearing_masks/len(resized_crop)*100
+                frame = cv2.putText(frame, (str(percent_wearing_masks) + "% wearing masks"), (30,30), cv2.FONT_HERSHEY_SIMPLEX,
                                             0.5, (255, 0, 0), 1, cv2.LINE_AA)
+                if(percent_wearing_masks != 100) and data != '':
+                    #AAAAAAAAAAAAA
+                    stream.write(data)
+                    data = wf.readframes(chunk)
+                    percent_wearing_masks = 100
 
             cv2.imshow('Input', frame)
             if cv2.waitKey(1) & 0xFF == ord('q'): 
@@ -144,6 +168,8 @@ while func != 4:
                 cv2.destroyAllWindows()
                 break
         print("bees")
+        stream.close()
+        p.terminate()
         
         #now we itlerate over the frames to see which faces are wearing a mask. We are counting the maximum number of people shown in the recording.
         max_masks = 0
@@ -173,19 +199,3 @@ while func != 4:
         time.sleep(2)
         print("@2020 @therealshazam \n -----------------------")
         break
-
-
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
