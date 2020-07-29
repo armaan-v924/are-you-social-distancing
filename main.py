@@ -2,6 +2,8 @@ import time #necessary to allow the person to take a picture with the camera mod
 import camera
 import cv2
 import os
+# import pyaudio
+import wave
 import model_setup as ms
 from model_setup import *
 from data import find_faces
@@ -28,13 +30,10 @@ while func != 5:
         print('Invalid Input. Please enter only \"1\" or \"2\" or \"3\" or \"4\" or \"5\"\n')
         func = 0
     except:
-        # time.sleep(2)
         print('Something went wrong. Please try again.\n')
-        # time.sleep(2)
         func = 0
     if func == 1:
         #Take a picture using the camera
-        # time.sleep(2)
         print("Taking a picture in 5...\r")
         time.sleep(1)
         print("4\r")
@@ -48,32 +47,74 @@ while func != 5:
         print("0")
         
         image = camera.take_picture()
-
         bb, cropped_faces, resized_crop = find_faces(image,model2)
-        if(type(resized_crop) == int and resized_crop == 0):
-                print("No faces detected")
-        else:
-            di.show_image(image, model, bb, resized_crop, True)
 
-        # time.sleep(2)
+        if(type(resized_crop) == int and resized_crop == 0):
+            image = cv2.putText(image, "No faces detected", (30,30), cv2.FONT_HERSHEY_SIMPLEX,
+                                        0.5, (255, 0, 0), 1, cv2.LINE_AA)
+        else:
+            image, num_wearing_masks = di.convert_image(image, model, bb, resized_crop)
+
+            percent_wearing_masks = num_wearing_masks/len(resized_crop)*100
+            image = cv2.putText(image, (str(percent_wearing_masks) + "% wearing masks"), (30,30), cv2.FONT_HERSHEY_SIMPLEX,
+                                        0.5, (255, 0, 0), 1, cv2.LINE_AA)
+            # if(percent_wearing_masks != 100) and data != '':
+            #     #AAAAAAAAAAAAA
+            #     stream.write(data)
+            #     data = wf.readframes(chunk)
+            #     percent_wearing_masks = 100
+
+        cv2.imshow('Input', image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
         print()
         func = 0
     elif func == 2:
-        # time.sleep(2)
-        image = cv2.imread(input("Please enter the complete image file path:").strip('"'))
+        image = cv2.imread(input("Please enter the complete image file path: ").strip('"'))
         image = image[:,:,::-1]
         bb, cropped_faces, resized_crop = find_faces(image,model2)
-        if(type(resized_crop) == int and resized_crop == 0):
-                print("No faces detected")
-        else:
-            di.show_image(image, model, bb, resized_crop, True)
 
-        # time.sleep(2)
+        if(type(resized_crop) == int and resized_crop == 0):
+            image = cv2.putText(image, "No faces detected", (30,30), cv2.FONT_HERSHEY_SIMPLEX,
+                                        0.5, (255, 0, 0), 1, cv2.LINE_AA)
+        else:
+            image, num_wearing_masks = di.convert_image(image, model, bb, resized_crop)
+
+            percent_wearing_masks = num_wearing_masks/len(resized_crop)*100
+            image = cv2.putText(image, (str(percent_wearing_masks) + "% wearing masks"), (30,30), cv2.FONT_HERSHEY_SIMPLEX,
+                                        0.5, (255, 0, 0), 1, cv2.LINE_AA)
+            # if(percent_wearing_masks != 100) and data != '':
+            #     #AAAAAAAAAAAAA
+            #     stream.write(data)
+            #     data = wf.readframes(chunk)
+            #     percent_wearing_masks = 100
+
+        cv2.imshow('Image', image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
         print()
         func = 0
 
     elif func == 3:
-        time.sleep(2)
+        #siren set up
+        filename = 'siren.wav'
+        chunk = 1024  
+
+        wf = wave.open(filename, 'rb')
+        p = pyaudio.PyAudio()
+
+        # Open a .Stream object to write the WAV file to
+        # 'output = True' indicates that the sound will be played rather than recorded
+        stream = p.open(format = p.get_format_from_width(wf.getsampwidth()),
+                        channels = wf.getnchannels(),
+                        rate = wf.getframerate(),
+                        output = True)
+
+        # Read data in chunks
+        data = wf.readframes(chunk)
+
         print("Recording a video in 5...\r")
         time.sleep(1)
         print("4\r")
@@ -88,7 +129,9 @@ while func != 5:
         vidframe = []
         if not vid.isOpened():
             raise IOError("Cannot open webcam")
-        print("Press the esc button to stop recording the video\n")
+            print()
+            func = 0
+        print("Press the 'q' button to stop capturing the video\n")
         while True:
             ret, frame = vid.read()
             
@@ -101,43 +144,36 @@ while func != 5:
                 #each frame calculate # with/without masks (live)
                 bb, cropped_faces, resized_crop = find_faces(frame,model2)
                 num_wearing_masks = 0
+
                 if(type(resized_crop) == int and resized_crop == 0):
-                    print("No faces detected")
+                    frame = cv2.putText(frame, "No faces detected", (30,30), cv2.FONT_HERSHEY_SIMPLEX,
+                                                0.5, (255, 0, 0), 1, cv2.LINE_AA)
                 else:
-                    frame = di.convert_image(frame, model, bb, resized_crop, bgr=False, resize=False)
+                    frame, num_wearing_masks = di.convert_image(frame, model, bb, resized_crop, bgr=False, resize=False)
+                    percent_wearing_masks = num_wearing_masks/len(resized_crop)*100
+                    frame = cv2.putText(frame, (str(percent_wearing_masks) + "% wearing masks"), (30,30), cv2.FONT_HERSHEY_SIMPLEX,
+                                                0.5, (255, 0, 0), 1, cv2.LINE_AA)
+                    # if(percent_wearing_masks != 100) and data != '':
+                    #     #AAAAAAAAAAAAA
+                    #     stream.write(data)
+                    #     data = wf.readframes(chunk)
+                    #     percent_wearing_masks = 100
+
+                cv2.imshow('Input',frame)
             else:
                 break
-            cv2.imshow('Input', frame)
+
             if cv2.waitKey(1) & 0xFF == ord('q'): 
                 vid.release()
                 cv2.destroyAllWindows()
                 break
-        print("bees")
-        
-        #now we itlerate over the frames to see which faces are wearing a mask. We are counting the maximum number of people shown in the recording.
-        max_masks = 0
-        max_people = 0
-        for crop in resized_crop:
-            num_wearing_masks = 0
-            predictions = (crop[:,np.newaxis,:,:].astype(np.float32)) / 255.
-            for face in crop:
-                print(predictions)
-                if(predictions[1] > predictions[0]): #wearing mask
-                    num_wearing_masks += 1
 
-            #the stats will be modified to indicate the maximum number of masks over the total number of people in the video.
-            if max_masks < num_wearing_masks:
-                max_masks = num_wearing_masks
-            if max_people < len(crop):
-                max_people = len(crop)
 
-        print(max_masks + " people wearing masks / ", max_people, " total people --> ", max_masks/max_people) #print stats
-
-        time.sleep(2)
         print()
         func = 0
+        stream.close()
+        p.terminate()
 
-    # Since the function is in a for loop, a shutdown module must be needed to break the loop and exit the program.
     elif func == 4:
         vid = cv2.VideoCapture(input("Please enter the complete video file path: ").strip('"'))
 
@@ -146,47 +182,40 @@ while func != 5:
 
             if ret == True:
                 frame = cv2.resize(frame,None,fx=0.25,fy=0.25,interpolation=cv2.INTER_AREA)
-                cv2.imshow('Input',frame)
                 width = vid.get(cv2.CAP_PROP_FRAME_WIDTH)  # float
                 height = vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
                 #each frame calculate # with/without masks (live)
                 bb, cropped_faces, resized_crop = find_faces(frame,model2)
-                num_wearing_masks = 0
-                if(type(resized_crop) == int and resized_crop == 0):
-                    print("No faces detected")
-                else:
-                    frame = di.convert_image(frame, model, bb, resized_crop, bgr=False, resize=False)
 
-                cv2.imshow('Input', frame)
-                if cv2.waitKey(1) & 0xFF == ord('q'): 
-                    vid.release()
-                    cv2.destroyAllWindows()
-                    break
+                if(type(resized_crop) == int and resized_crop == 0):
+                    frame = cv2.putText(frame, "No faces detected", (30,30), cv2.FONT_HERSHEY_SIMPLEX,
+                                                0.5, (255, 0, 0), 1, cv2.LINE_AA)
+                else:
+                    frame, num_wearing_masks = di.convert_image(frame, model, bb, resized_crop, bgr=False, resize=False)
+                    percent_wearing_masks = num_wearing_masks/len(resized_crop)*100
+                    frame = cv2.putText(frame, (str(percent_wearing_masks) + "% wearing masks"), (30,30), cv2.FONT_HERSHEY_SIMPLEX,
+                                                0.5, (255, 0, 0), 1, cv2.LINE_AA)
+                    # if(percent_wearing_masks != 100) and data != '':
+                    #     #AAAAAAAAAAAAA
+                    #     stream.write(data)
+                    #     data = wf.readframes(chunk)
+                    #     percent_wearing_masks = 100
+
+                cv2.imshow('Video', frame)
             else:
                 break
+
+            if cv2.waitKey(1) & 0xFF == ord('q'): 
+                vid.release()
+                cv2.destroyAllWindows()
+                break
+
         vid.release()
         cv2.destroyAllWindows()
 
-        # time.sleep(2)
         print()
         func = 0
     elif func == 5:
-        time.sleep(2)
-        print("@2020 @therealshazam \n -----------------------")
+        # Since the function is in a for loop, a shutdown module must be needed to break the loop and exit the program.
+        print("@2020 @therealshazam\n-----------------------")
         break
-
-
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
