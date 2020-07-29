@@ -46,16 +46,19 @@ while func != 4:
         print("0")
         
         cropped_faces, resized_crop = find_faces(camera.take_picture())
-        num_wearing_masks = 0
-        for face in resized_crop:
-            convertedOne, convertedTwo = ms.convert_data(face.reshape(1, 160, 160)) #have to reshape for one image and send to convert data to normalize
-            converted = np.append(convertedOne, convertedTwo, axis=0)
-            predictions = model(converted)
-            
-            print("PREDICTIONS = ", predictions)
-            if(predictions[0,1] > predictions[0,0]): #wearing mask
-                num_wearing_masks += 1
-        print(num_wearing_masks, " people wearing masks / ", len(resized_crop), " total people --> ", float(num_wearing_masks/len(resized_crop)), "%") #print stats
+        if(type(resized_crop) == int and resized_crop == 0):
+                print("No faces detected")
+        else:
+            num_wearing_masks = 0
+            for face in resized_crop:
+                convertedOne, convertedTwo = ms.convert_data(face.reshape(1, 160, 160)) #have to reshape for one image and send to convert data to normalize
+                converted = np.append(convertedOne, convertedTwo, axis=0)
+                predictions = model(converted)
+                
+                print("PREDICTIONS = ", predictions)
+                if(predictions[0,1] > predictions[0,0]): #wearing mask
+                    num_wearing_masks += 1
+            print(num_wearing_masks, " people wearing masks / ", len(resized_crop), " total people --> ", float(num_wearing_masks/len(resized_crop)), "%") #print stats
 
         time.sleep(2)
         print()
@@ -63,16 +66,19 @@ while func != 4:
     elif func == 2:
         time.sleep(2)
         cropped_faces, resized_crop = find_faces(input("Please enter the complete image file path:").strip('"'))
-        num_wearing_masks = 0
-        for face in resized_crop:
-            convertedOne, convertedTwo = ms.convert_data(face.reshape(1, 160, 160)) #have to reshape for one image and send to convert data to normalize
-            converted = np.append(convertedOne, convertedTwo, axis=0)
-            predictions = model(converted)
-            
-            print("PREDICTIONS = ", predictions)
-            if(predictions[0,1] > predictions[0,0]): #wearing mask
-                num_wearing_masks += 1
-        print(num_wearing_masks, " people wearing masks / ", len(resized_crop), " total people --> ", num_wearing_masks/len(resized_crop)) #print stats
+        if(type(resized_crop) == int and resized_crop == 0):
+                print("No faces detected")
+        else:
+            num_wearing_masks = 0
+            for face in resized_crop:
+                convertedOne, convertedTwo = ms.convert_data(face.reshape(1, 160, 160)) #have to reshape for one image and send to convert data to normalize
+                converted = np.append(convertedOne, convertedTwo, axis=0)
+                predictions = model(converted)
+                
+                print("PREDICTIONS = ", predictions)
+                if(predictions[0,1] > predictions[0,0]): #wearing mask
+                    num_wearing_masks += 1
+            print(num_wearing_masks, " people wearing masks / ", len(resized_crop), " total people --> ", num_wearing_masks/len(resized_crop)) #print stats
 
         time.sleep(2)
         print()
@@ -104,13 +110,16 @@ while func != 4:
             #each frame calculate # with/without masks (live)
             cropped_faces, resized_crop = find_faces(frame)
             num_wearing_masks = 0
-            for face in resized_crop:
-                convertedOne, convertedTwo = ms.convert_data(face.reshape(1, 160, 160)) #have to reshape for one image and send to convert data to normalize
-                converted = np.append(convertedOne, convertedTwo, axis=0)
-                predictions = model(converted)
-                if(predictions[0,1] > predictions[0,0]): #wearing mask
-                    num_wearing_masks += 1
-            print(num_wearing_masks, " people wearing masks / ", len(resized_crop), " total people --> ", num_wearing_masks/len(resized_crop), "%") #print stats
+            if(type(resized_crop) == int and resized_crop == 0):
+                print("No faces detected")
+            else:
+                for face in resized_crop:
+                    convertedOne, convertedTwo = ms.convert_data(face.reshape(1, 160, 160)) #have to reshape for one image and send to convert data to normalize
+                    converted = np.append(convertedOne, convertedTwo, axis=0)
+                    predictions = model(converted)
+                    if(predictions[0,1] > predictions[0,0]): #wearing mask
+                        num_wearing_masks += 1
+                print(num_wearing_masks, " people wearing masks / ", len(resized_crop), " total people --> ", num_wearing_masks/len(resized_crop), "%") #print stats
 
             if cv2.waitKey(1) & 0xFF == ord('q'): 
                 vid.release()
