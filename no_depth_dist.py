@@ -26,7 +26,6 @@ def r_u_sd_in_2d(landmarks, threshold=72):
 
     dist_x = landmarks[0,0,0] - landmarks[0,1,0]
     dist_y = landmarks[0,0,1] - landmarks[0,0,1]
-    print(dist_x,dist_y)
     dist_in_pixels = np.sqrt(dist_x ** 2 + dist_y ** 2)
     ratio = actual_dist / dist_in_pixels
     
@@ -41,7 +40,6 @@ def r_u_sd_in_2d(landmarks, threshold=72):
         #compute & compare
         distance_btw_faces_pxls = np.sqrt((nose[0] - other_nose[0]) ** 2 + (nose[1] - other_nose[1]) ** 2)
         distance_btw_faces_actual = distance_btw_faces_pxls * ratio
-        print(distance_btw_faces_actual)
         if(distance_btw_faces_actual < threshold):
             are_you = False
             break

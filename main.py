@@ -10,6 +10,7 @@ from model_setup import *
 from data import find_faces
 import display_image as di
 from facenet_models import FacenetModel
+from no_depth_dist import *
 vid = cv2.VideoCapture(0)
 
 percent_wearing_masks = 100
@@ -203,7 +204,7 @@ while func != 5:
                 width = vid.get(cv2.CAP_PROP_FRAME_WIDTH)  # float
                 height = vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
                 #each frame calculate # with/without masks (live)
-                bb, cropped_faces, resized_crop = find_faces(frame,model2)
+                landmarks, bb, cropped_faces, resized_crop = find_faces(frame,model2)
 
                 if(type(resized_crop) == int and resized_crop == 0):
                     frame = cv2.putText(frame, "No faces detected", (30,30), cv2.FONT_HERSHEY_SIMPLEX,
