@@ -26,10 +26,10 @@ def find_faces(image,model):
         img = img[:,:,::-1]
 
     # Detect Faces
-    bounding_boxes, _, _ = model.detect(img)
+    bounding_boxes, _, landmarks = model.detect(img)
 
     if bounding_boxes is None:
-        return (None, 0, 0)
+        return (None, None, 0, 0)
 
     for bound in bounding_boxes:
         bound[bound<0]=0
@@ -37,4 +37,4 @@ def find_faces(image,model):
     # Cropped Face
     cropped_face = [img[int(bounding_boxes[n][1]):int(bounding_boxes[n][3]), int(bounding_boxes[n][0]):int(bounding_boxes[n][2])] for n in range(bounding_boxes.shape[0])]
     resized_crop = np.array([cv2.cvtColor(cv2.resize(img, (160, 160)), cv2.COLOR_RGB2GRAY) for img in cropped_face])
-    return bounding_boxes, cropped_face, resized_crop
+    return landmarks, bounding_boxes, cropped_face, resized_crop

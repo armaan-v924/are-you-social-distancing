@@ -6,6 +6,7 @@ import model_setup as ms
 from model_setup import *
 from data import find_faces
 from facenet_models import FacenetModel
+from no_depth_dist import *
 vid = cv2.VideoCapture(0)
 
 #loading screen
@@ -47,7 +48,7 @@ while func != 4:
         time.sleep(1)
         print("0")
         
-        bb, cropped_faces, resized_crop = find_faces(camera.take_picture(),model2)
+        landmarks, bb, cropped_faces, resized_crop = find_faces(camera.take_picture(),model2)
         if(type(resized_crop) == int and resized_crop == 0):
                 print("No faces detected")
         else:
@@ -67,7 +68,7 @@ while func != 4:
         func = 0
     elif func == 2:
         time.sleep(2)
-        bb, cropped_faces, resized_crop = find_faces(input("Please enter the complete image file path:").strip('"'),model2)
+        landmarks, bb, cropped_faces, resized_crop = find_faces(input("Please enter the complete image file path:").strip('"'),model2)
         if(type(resized_crop) == int and resized_crop == 0):
                 print("No faces detected")
         else:
@@ -89,16 +90,7 @@ while func != 4:
     elif func == 3:
         time.sleep(2)
         print("Recording a video in 5...\r")
-        time.sleep(1)
-        print("4\r")
-        time.sleep(1)
-        print("3\r")
-        time.sleep(1)
-        print("2\r")
-        time.sleep(1)
-        print("1\r")
-        time.sleep(1)
-        print("0")
+
         vidframe = []
         if not vid.isOpened():
             raise IOError("Cannot open webcam")
@@ -111,7 +103,7 @@ while func != 4:
             width = vid.get(cv2.CAP_PROP_FRAME_WIDTH)  # float
             height = vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
             #each frame calculate # with/without masks (live)
-            bb, cropped_faces, resized_crop = find_faces(frame,model2)
+            landmarks, bb, cropped_faces, resized_crop = find_faces(frame,model2)
             num_wearing_masks = 0
             if(type(resized_crop) == int and resized_crop == 0):
                 frame = cv2.putText(frame, "No faces detected", (30,30), cv2.FONT_HERSHEY_SIMPLEX,
@@ -134,6 +126,11 @@ while func != 4:
                         frame = cv2.putText(frame, 'NO MASK', (bb[counter][0], bb[counter][1]), cv2.FONT_HERSHEY_SIMPLEX,
                                             0.5, (0, 0, 255), 1, cv2.LINE_AA)
                     counter+=1
+                if len(resized_crop) > 1:
+                    for i in range(len(resized_crop)-1):
+                        if r_u_sd_in_2d(landmarks[i:i+2], threshold=72) == False:
+                            frame = cv2.line(frame,(landmarks[i, 2][0],landmarks[i, 2][1]),
+                                             (landmarks[i+1, 2][0],landmarks[i+1, 2][1]),(0, 0, 255),2)
 
                 frame = cv2.putText(frame, (str(num_wearing_masks/len(resized_crop)*100) + "% wearing masks"), (30,30), cv2.FONT_HERSHEY_SIMPLEX,
                                             0.5, (255, 0, 0), 1, cv2.LINE_AA)
