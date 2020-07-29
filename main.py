@@ -58,11 +58,6 @@ while func != 5:
             percent_wearing_masks = num_wearing_masks/len(resized_crop)*100
             image = cv2.putText(image, (str(percent_wearing_masks) + "% wearing masks"), (30,30), cv2.FONT_HERSHEY_SIMPLEX,
                                         0.5, (255, 0, 0), 1, cv2.LINE_AA)
-            # if(percent_wearing_masks != 100) and data != '':
-            #     #AAAAAAAAAAAAA
-            #     stream.write(data)
-            #     data = wf.readframes(chunk)
-            #     percent_wearing_masks = 100
 
         cv2.imshow('Input', image)
         cv2.waitKey(0)
@@ -84,11 +79,6 @@ while func != 5:
             percent_wearing_masks = num_wearing_masks/len(resized_crop)*100
             image = cv2.putText(image, (str(percent_wearing_masks) + "% wearing masks"), (30,30), cv2.FONT_HERSHEY_SIMPLEX,
                                         0.5, (255, 0, 0), 1, cv2.LINE_AA)
-            # if(percent_wearing_masks != 100) and data != '':
-            #     #AAAAAAAAAAAAA
-            #     stream.write(data)
-            #     data = wf.readframes(chunk)
-            #     percent_wearing_masks = 100
 
         cv2.imshow('Image', image)
         cv2.waitKey(0)
@@ -153,11 +143,11 @@ while func != 5:
                     percent_wearing_masks = num_wearing_masks/len(resized_crop)*100
                     frame = cv2.putText(frame, (str(percent_wearing_masks) + "% wearing masks"), (30,30), cv2.FONT_HERSHEY_SIMPLEX,
                                                 0.5, (255, 0, 0), 1, cv2.LINE_AA)
-                    # if(percent_wearing_masks != 100) and data != '':
-                    #     #AAAAAAAAAAAAA
-                    #     stream.write(data)
-                    #     data = wf.readframes(chunk)
-                    #     percent_wearing_masks = 100
+                    if(percent_wearing_masks != 100) and data != '':
+                        #AAAAAAAAAAAAA
+                        stream.write(data)
+                        data = wf.readframes(chunk)
+                        percent_wearing_masks = 100
 
                 cv2.imshow('Input',frame)
             else:
@@ -195,11 +185,6 @@ while func != 5:
                     percent_wearing_masks = num_wearing_masks/len(resized_crop)*100
                     frame = cv2.putText(frame, (str(percent_wearing_masks) + "% wearing masks"), (30,30), cv2.FONT_HERSHEY_SIMPLEX,
                                                 0.5, (255, 0, 0), 1, cv2.LINE_AA)
-                    # if(percent_wearing_masks != 100) and data != '':
-                    #     #AAAAAAAAAAAAA
-                    #     stream.write(data)
-                    #     data = wf.readframes(chunk)
-                    #     percent_wearing_masks = 100
 
                 cv2.imshow('Video', frame)
             else:
