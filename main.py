@@ -100,19 +100,23 @@ while func != 4:
             frame = cv2.resize(frame,None,fx=0.5,fy=0.5,interpolation=cv2.INTER_AREA)
             cv2.imshow('Input',frame)
             vidframe.append(frame)
+            
+            #each frame calculate # with/without masks (live)
+            cropped_faces, resized_crop = find_faces(frame)
+            num_wearing_masks = 0
+            for face in resized_crop:
+                convertedOne, convertedTwo = ms.convert_data(face.reshape(1, 160, 160)) #have to reshape for one image and send to convert data to normalize
+                converted = np.append(convertedOne, convertedTwo, axis=0)
+                predictions = model(converted)
+                if(predictions[0,1] > predictions[0,0]): #wearing mask
+                    num_wearing_masks += 1
+            print(num_wearing_masks, " people wearing masks / ", len(resized_crop), " total people --> ", num_wearing_masks/len(resized_crop), "%") #print stats
+
             if cv2.waitKey(1) & 0xFF == ord('q'): 
                 vid.release()
                 cv2.destroyAllWindows()
                 break
         print("bees")
-        #set two lists so that it includes cropped faces and resized images.
-        cropped_faces = []
-        resized_crops = []
-        #adds a cropped face and the resized frame for each frame of the video.
-        for v in vidframe:
-            cropped_face, resized_crop = find_faces(v)
-            cropped_faces.append(cropped_face)
-            resized_crops.append(resized_crop)
         
         #now we itlerate over the frames to see which faces are wearing a mask. We are counting the maximum number of people shown in the recording.
         max_masks = 0
