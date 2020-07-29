@@ -22,16 +22,16 @@ try:
 
     if value==1:
         if path.exists("with_masks.npy"):
-            old_faces = np.load("with_masks.npy")
+            old_faces = list(np.load("with_masks.npy"))
             print("[DEBUG] Loaded with_masks.npy")
-            new_faces = np.append(new_faces, old_faces)
+            new_faces = new_faces + old_faces
         np.save("with_masks.npy", new_faces, allow_pickle=False)
         print("[DEBUG] Saved with_masks.npy")
     else:
         if path.exists("without_masks.npy"):
-            old_faces = np.load("without_masks.npy")
+            old_faces = list(np.load("without_masks.npy"))
             print("[DEBUG] Loaded without_masks.npy")
-            new_faces = np.append(new_faces, old_faces)
+            new_faces = new_faces + old_faces
         np.save("without_masks.npy", new_faces, allow_pickle=False)
         print("[DEBUG] Saved without_masks.npy")
 except ValueError: 

@@ -1,5 +1,4 @@
 # Imports
-from facenet_models import FacenetModel
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,7 +6,7 @@ import cv2
 import camera
 
 # Create Rectangles
-def find_faces(image):
+def find_faces(image,model):
     """ Using facenet_models, locate faces in a given picture and create descriptor vecors
     Parameters:
     -----------
@@ -26,19 +25,16 @@ def find_faces(image):
         img = cv2.imread(image)
         img = img[:,:,::-1]
 
-    # Create model
-    model = FacenetModel()
-
     # Detect Faces
     bounding_boxes, _, _ = model.detect(img)
 
     if bounding_boxes is None:
-        return (0, 0)
+        return (None, 0, 0)
 
     for bound in bounding_boxes:
         bound[bound<0]=0
 
     # Cropped Face
     cropped_face = [img[int(bounding_boxes[n][1]):int(bounding_boxes[n][3]), int(bounding_boxes[n][0]):int(bounding_boxes[n][2])] for n in range(bounding_boxes.shape[0])]
-    resized_crop = np.array([cv2.cvtColor(cv2.resize(img, (160, 160)), cv2.COLOR_BGR2GRAY) for img in cropped_face])
-    return bounding_boxes, resized_crop
+    resized_crop = np.array([cv2.cvtColor(cv2.resize(img, (160, 160)), cv2.COLOR_RGB2GRAY) for img in cropped_face])
+    return bounding_boxes, cropped_face, resized_crop
