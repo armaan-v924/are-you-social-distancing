@@ -45,6 +45,7 @@ def convert_image(image, model, bounding_boxes, resized_crop, bgr=True, resize=T
 
     preds = model(converted)
     preds = np.argmax(preds, axis=1)
+    num_wearing_masks = np.count_nonzero(preds)
 
     for box, pred in zip(bounding_boxes, preds):
         if pred==1:
@@ -65,30 +66,4 @@ def convert_image(image, model, bounding_boxes, resized_crop, bgr=True, resize=T
             image = cv2.putText(image, text, (box[0], box[3]+15), cv2.FONT_HERSHEY_COMPLEX, 0.5, color, 1)
     if bgr:
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    return image
-
-def show_image(image, model, bounding_boxes, resized, bgr):
-    """Uses faces found from data.find_faces and a trained model to, draw green boxes 
-    around the faces with masks on, and draw red boxes around the faces without masks on.
-
-    If desired, resizes original image to be of height 1000 px or width 1000 px.
-
-    Parameters:
-    -----------
-    image: np.ndarray, describes image to be displayed
-    model: Model, trained model that will predict mask/no mask category for each face
-    bounding_boxes: list, list of coordinates for each face (returned by data.find_faces)
-    resized_crop: list, list of faces in image, (returned by data.find_faces)
-    bgr: boolean (optional), True = bgr images, need to be converted (cv2.readimg was used)
-                             False = rgb image, does not need to be converted
-    resize: boolean (optional), True = resize image to be of height/width 1000px if original
-                                image had height/width smaller than 500px
-                                False = don't resize image
-    Returns:
-    --------
-    None 
-    """
-    image = convert_image(image, model, bounding_boxes, resized, bgr)
-    cv2.imshow("Image", image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    return image, num_wearing_masks
