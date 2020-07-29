@@ -47,7 +47,7 @@ while func != 5:
         time.sleep(1)
         print("0")
         
-        bb, cropped_faces, resized_crop = find_faces(camera.take_picture(),model2)
+        landmarks, bb, cropped_faces, resized_crop = find_faces(camera.take_picture(),model2)
         if(type(resized_crop) == int and resized_crop == 0):
                 print("No faces detected")
         else:
@@ -65,7 +65,7 @@ while func != 5:
         print()
         func = 0
     elif func == 2:
-        bb, cropped_faces, resized_crop = find_faces(input("Please enter the complete image file path:").strip('"'),model2)
+        landmarks, bb, cropped_faces, resized_crop = find_faces(input("Please enter the complete image file path:").strip('"'),model2)
         if(type(resized_crop) == int and resized_crop == 0):
                 print("No faces detected")
         else:
@@ -127,7 +127,7 @@ while func != 5:
             width = vid.get(cv2.CAP_PROP_FRAME_WIDTH)  # float
             height = vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
             #each frame calculate # with/without masks (live)
-            bb, cropped_faces, resized_crop = find_faces(frame,model2)
+            landmarks, bb, cropped_faces, resized_crop = find_faces(frame,model2)
             num_wearing_masks = 0
             if(type(resized_crop) == int and resized_crop == 0):
                 frame = cv2.putText(frame, "No faces detected", (30,30), cv2.FONT_HERSHEY_SIMPLEX,
@@ -150,6 +150,12 @@ while func != 5:
                         frame = cv2.putText(frame, 'NO MASK', (bb[counter][0], bb[counter][1]), cv2.FONT_HERSHEY_SIMPLEX,
                                             0.5, (0, 0, 255), 1, cv2.LINE_AA)
                     counter+=1
+
+                if len(resized_crop) > 1:
+                    for i in range(len(resized_crop)-1):
+                        if r_u_sd_in_2d(landmarks[i:i+2], threshold=72) == False:
+                            frame = cv2.line(frame,(landmarks[i, 2][0],landmarks[i, 2][1]),
+                                             (landmarks[i+1, 2][0],landmarks[i+1, 2][1]),(0, 0, 255),2)
 
                 percent_wearing_masks = num_wearing_masks/len(resized_crop)*100
                 frame = cv2.putText(frame, (str(percent_wearing_masks) + "% wearing masks"), (30,30), cv2.FONT_HERSHEY_SIMPLEX,
