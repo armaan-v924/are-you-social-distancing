@@ -171,6 +171,7 @@ while func != 5:
                 cv2.destroyAllWindows()
                 break
 
+
         time.sleep(2)
         print()
         func = 0
@@ -184,3 +185,21 @@ while func != 5:
         time.sleep(2)
         print("@2020 @therealshazam\n-----------------------")
         break
+
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+>>>>>>> f444904b77df533a9ddea7160ae1259920791443
