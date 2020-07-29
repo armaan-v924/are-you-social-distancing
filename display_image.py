@@ -47,20 +47,20 @@ def convert_image(images, model, bgr=True):
 
             if pred==0:
                 color = (0, 255, 0)
-                # text = "Mask"
+                text = "Mask"
             else:
                 if bgr:
                     color = (255, 0, 0)
                 else:
                     color = (0, 0, 255)
-                # text = "Fail"
+                text = "Fail"
             
             image = cv2.rectangle(image, (box[0], box[1]), (box[2], box[3]), color, 2)
 
-            # if box[1] > (height*sf) - 10:
-            #     image = cv2.putText(image, text, (box[0], box[1]-10), cv2.FONT_HERSHEY_COMPLEX, 0.5, color, 2)
-            # else:
-            #     image = cv2.putText(image, text, (box[0], box[3]+15), cv2.FONT_HERSHEY_COMPLEX, 0.5, color, 1)
+            if box[1] > (height*sf) - 10:
+                image = cv2.putText(image, text, (box[0], box[1]-10), cv2.FONT_HERSHEY_COMPLEX, 0.5, color, 2)
+            else:
+                image = cv2.putText(image, text, (box[0], box[3]+15), cv2.FONT_HERSHEY_COMPLEX, 0.5, color, 1)
         if bgr:
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         images[i] = image
@@ -82,9 +82,6 @@ def show_image(images, model, bgr):
     --------
     None 
     """
-    legend = cv2.imread("legend.png")
-    cv2.imshow("Legend", legend)
-
     images = convert_image(images, model, bgr)
     for image in images:
         cv2.imshow("Image", image)
@@ -134,8 +131,6 @@ def show_video(file_path, model):
     # print("video saved") # DEBUGGING
 
     cap = cv2.VideoCapture('project.avi')
-    legend = cv2.imread("legend.png")
-    cv2.imshow("Legend", legend)
 
     while(cap.isOpened()):
         ret, frame = cap.read()
