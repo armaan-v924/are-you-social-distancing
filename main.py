@@ -31,6 +31,7 @@ while func != 5:
         func = 0
     except:
         print('Something went wrong. Please try again.\n')
+        print()
         func = 0
     if func == 1:
         #Take a picture using the camera
@@ -45,9 +46,11 @@ while func != 5:
         print("1\r")
         time.sleep(1)
         print("0")
+
+
         
         image = camera.take_picture()
-        bb, cropped_faces, resized_crop = find_faces(image,model2)
+        landmarks, bb, cropped_faces, resized_crop = find_faces(image,model2)
 
         if(type(resized_crop) == int and resized_crop == 0):
             image = cv2.putText(image, "No faces detected", (30,30), cv2.FONT_HERSHEY_SIMPLEX,
@@ -68,7 +71,7 @@ while func != 5:
     elif func == 2:
         image = cv2.imread(input("Please enter the complete image file path: ").strip('"'))
         image = image[:,:,::-1]
-        bb, cropped_faces, resized_crop = find_faces(image,model2)
+        landmarks, bb, cropped_faces, resized_crop = find_faces(image,model2)
 
         if(type(resized_crop) == int and resized_crop == 0):
             image = cv2.putText(image, "No faces detected", (30,30), cv2.FONT_HERSHEY_SIMPLEX,
@@ -143,6 +146,13 @@ while func != 5:
                     percent_wearing_masks = num_wearing_masks/len(resized_crop)*100
                     frame = cv2.putText(frame, (str(percent_wearing_masks) + "% wearing masks"), (30,30), cv2.FONT_HERSHEY_SIMPLEX,
                                                 0.5, (255, 0, 0), 1, cv2.LINE_AA)
+
+                    if len(resized_crop) > 1:
+                        for i in range(len(resized_crop)-1):
+                            if r_u_sd_in_2d(landmarks[i:i+2], threshold=72) == False:
+                                frame = cv2.line(frame,(landmarks[i, 2][0],landmarks[i, 2][1]),
+                                                (landmarks[i+1, 2][0],landmarks[i+1, 2][1]),(0, 0, 255),2)
+
                     if(percent_wearing_masks != 100) and data != '':
                         #AAAAAAAAAAAAA
                         stream.write(data)
