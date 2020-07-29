@@ -114,7 +114,8 @@ while func != 4:
             bb, cropped_faces, resized_crop = find_faces(frame,model2)
             num_wearing_masks = 0
             if(type(resized_crop) == int and resized_crop == 0):
-                print("No faces detected")
+                frame = cv2.putText(frame, "No faces detected", (30,30), cv2.FONT_HERSHEY_SIMPLEX,
+                                            0.5, (255, 0, 0), 1, cv2.LINE_AA)
             else:
                 counter = 0
                 for face in resized_crop:
@@ -133,7 +134,9 @@ while func != 4:
                         frame = cv2.putText(frame, 'NO MASK', (bb[counter][0], bb[counter][1]), cv2.FONT_HERSHEY_SIMPLEX,
                                             0.5, (0, 0, 255), 1, cv2.LINE_AA)
                     counter+=1
-                print(num_wearing_masks, " people wearing masks / ", len(resized_crop), " total people --> ", num_wearing_masks/len(resized_crop)*100, "%") #print stats
+
+                frame = cv2.putText(frame, (str(num_wearing_masks/len(resized_crop)*100) + "% wearing masks"), (30,30), cv2.FONT_HERSHEY_SIMPLEX,
+                                            0.5, (255, 0, 0), 1, cv2.LINE_AA)
 
             cv2.imshow('Input', frame)
             if cv2.waitKey(1) & 0xFF == ord('q'): 
